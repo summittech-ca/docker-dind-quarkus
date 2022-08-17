@@ -1,0 +1,39 @@
+# Inspired by https://github.com/fhivemind/concourse-dind
+
+FROM quay.io/quarkus/ubi-quarkus-mandrel:21.3.3.0-Final-java17
+
+ENV DOCKER_CHANNEL=stable \
+    DOCKER_VERSION=20.10.17 \
+    DOCKER_COMPOSE_VERSION=2.9.0 \
+    DOCKER_SQUASH=0.2.0 \
+    DEBIAN_FRONTEND=noninteractive \
+    JAVA_MAJORVER=17 \
+    GRAALVM_ARCH=amd64 \
+    GRAALVM_VERSION=22.2.0
+
+# Install Docker, Docker Machine, Docker Squash
+USER root
+RUN microdnf update
+RUN microdnf install -y yum-utils procps findutils wget bash curl wget net-tools iproute
+RUN yum-config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+RUN microdnf install -y docker-ce-3:20.10.17-3.el8.x86_64
+RUN wget -L https://github.com/docker/machine/releases/download/v0.8.0-rc1/docker-machine-`uname -s`-`uname -m`
+RUN mv docker-machine-`uname -s`-`uname -m` /usr/local/bin/docker-machine
+RUN chmod +x /usr/local/bin/docker-machine
+RUN microdnf install -y sudo
+RUN echo "quarkus ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/quarkus
+
+# RHEL8 in their infinite wisdom removed the binaries for
+# iptables-legacy, so we're left resorting to obscure 1-off pckages
+# N.B.: these packages from quay.io/calico/node:release-v3.13
+RUN mkdir -p /tmp/rpms
+COPY iptables-1.8.2-16.el8.x86_64.rpm /tmp/rpms
+RUN rpm -i --nodeps --force /tmp/rpms/iptables-1.8.2-16.el8.x86_64.rpm
+
+# USER quarkus
+
+WORKDIR /shared
+COPY docker-entrypoint.sh /bin/entrypoint.sh
+
+ENTRYPOINT ["/bin/entrypoint.sh"]
+
