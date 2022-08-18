@@ -13,6 +13,7 @@ ENV DOCKER_CHANNEL=stable \
 
 # Install Docker, Docker Compose, Docker Squash
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get -y install \
         bash \
         curl \
