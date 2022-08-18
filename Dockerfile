@@ -51,6 +51,10 @@ ENV PATH "$PATH:/usr/lib/jvm/graalvm-ce-java${JAVA_MAJORVER}-${GRAALVM_VERSION}/
 ENV JAVA_HOME "/usr/lib/jvm/graalvm-ce-java${JAVA_MAJORVER}-${GRAALVM_VERSION}/"
 ENV GRAALVM_HOME "/usr/lib/jvm/graalvm-ce-java${JAVA_MAJORVER}-${GRAALVM_VERSION}/"
 
+# native-image building needs gcc, make, ...
 RUN gu install native-image
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get -y install build-essential libz-dev zlib1g-dev
 
 ENTRYPOINT ["/bin/entrypoint.sh"]
