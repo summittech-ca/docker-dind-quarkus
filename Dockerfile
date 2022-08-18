@@ -49,5 +49,8 @@ COPY docker-entrypoint.sh /bin/entrypoint.sh
 
 ENV PATH "$PATH:/usr/lib/jvm/graalvm-ce-java${JAVA_MAJORVER}-${GRAALVM_VERSION}/bin/"
 ENV JAVA_HOME "/usr/lib/jvm/graalvm-ce-java${JAVA_MAJORVER}-${GRAALVM_VERSION}/"
+ENV GRAALVM_HOME "/usr/lib/jvm/graalvm-ce-java${JAVA_MAJORVER}-${GRAALVM_VERSION}/"
+
+RUN gu install native-image
 
 ENTRYPOINT ["/bin/entrypoint.sh"]
