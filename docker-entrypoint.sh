@@ -105,8 +105,6 @@ start_docker() {
     docker_opts+=' --data-root /scratch/docker'
   fi
 
-  docker_opts+=' --storage-driver=overlay'
-
   rm -f "${DOCKERD_PID_FILE}"
   touch "${DOCKERD_LOG_FILE}"
 
