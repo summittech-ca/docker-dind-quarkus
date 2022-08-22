@@ -14,7 +14,7 @@ ENV DOCKER_CHANNEL=stable \
 # Install Docker, Docker Machine, Docker Squash
 USER root
 RUN microdnf update
-RUN microdnf install -y yum-utils procps findutils wget bash curl wget net-tools
+RUN microdnf install -y yum-utils procps findutils wget bash curl wget net-tools iproute
 RUN yum-config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
 RUN microdnf install -y docker-ce-3:20.10.17-3.el8.x86_64
 RUN wget -L https://github.com/docker/machine/releases/download/v0.8.0-rc1/docker-machine-`uname -s`-`uname -m`
@@ -22,6 +22,13 @@ RUN mv docker-machine-`uname -s`-`uname -m` /usr/local/bin/docker-machine
 RUN chmod +x /usr/local/bin/docker-machine
 RUN microdnf install -y sudo
 RUN echo "quarkus ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/quarkus
+
+# RHEL8 in their infinite wisdom removed the binaries for
+# iptables-legacy, so we're left resorting to obscure 1-off pckages
+RUN mkdir -p /tmp/rpms
+COPY iptables-utils-1.8.2-16.el8.x86_64.rpm /tmp/rpms
+RUN rpm -i --nodeps --force /tmp/rpms/iptables-utils-1.8.2-16.el8.x86_64.rpm
+
 # USER quarkus
 
 WORKDIR /shared

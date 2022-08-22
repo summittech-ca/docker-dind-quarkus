@@ -10,7 +10,7 @@ set -o errexit -o pipefail -o nounset
 # Switch to iptables-legacy if needed
 if ! iptables -L; then
   echo >&2 "'iptables -L' failed; trying with iptables-legacy?"
-	update-alternatives --set iptables /usr/sbin/iptables-legacy
+	update-alternatives --set iptables /usr/sbin/iptables-legacy || ( alternatives --install /usr/sbin/iptables iptables /usr/sbin/iptables-legacy 1 && alternatives --install /usr/sbin/ip6tables ip6tables /usr/sbin/ip6tables-legacy 1 )
 	if ! iptables -L; then
 	  echo >&2 "'iptables -L' failed even with iptables-legacy, docker is likely to fail to start"
 	fi
