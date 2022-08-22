@@ -58,7 +58,4 @@ RUN apt-get update && \
     apt-get -y install build-essential libz-dev zlib1g-dev
 RUN apt-get install -y kmod
 
-# switch to iptables-legacy (debugging concourse in minikube)
-RUN update-alternatives --set iptables /usr/sbin/iptables-legacy
-
 ENTRYPOINT ["/bin/entrypoint.sh"]
