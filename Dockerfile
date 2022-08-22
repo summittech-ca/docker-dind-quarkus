@@ -56,5 +56,6 @@ RUN gu install native-image
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get -y install build-essential libz-dev zlib1g-dev
+RUN apt-get install -y kmod
 
 ENTRYPOINT ["/bin/entrypoint.sh"]
