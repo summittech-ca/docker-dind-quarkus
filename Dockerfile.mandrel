@@ -14,7 +14,7 @@ ENV DOCKER_CHANNEL=stable \
 # Install Docker, Docker Machine, Docker Squash
 USER root
 RUN microdnf update
-RUN microdnf install -y yum-utils procps findutils wget bash curl wget net-tools iproute
+RUN microdnf install -y yum-utils procps findutils wget bash curl wget net-tools iproute jq
 RUN yum-config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
 RUN microdnf install -y docker-ce-3:20.10.17-3.el8.x86_64
 RUN wget -L https://github.com/docker/machine/releases/download/v0.8.0-rc1/docker-machine-`uname -s`-`uname -m`
