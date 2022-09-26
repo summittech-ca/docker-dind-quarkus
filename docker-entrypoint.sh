@@ -100,6 +100,7 @@ start_docker() {
   mkdir -p /var/log
   mkdir -p /var/run
 
+  set -e
   sanitize_cgroups
 
   # check for /proc/sys being mounted readonly, as systemd does
@@ -122,6 +123,7 @@ start_docker() {
 
   rm -f "${DOCKERD_PID_FILE}"
   touch "${DOCKERD_LOG_FILE}"
+  set +e
 
   echo >&2 "Starting Docker..."
   dockerd ${docker_opts} &>"${DOCKERD_LOG_FILE}" &
