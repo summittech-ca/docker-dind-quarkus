@@ -100,8 +100,9 @@ start_docker() {
   mkdir -p /var/log
   mkdir -p /var/run
 
-  set -e
-  sanitize_cgroups
+  set +errexit
+  sanitize_cgroups || echo "NOTE: sanitize_cgroups() returned non-zero"
+  set -errexit
 
   # check for /proc/sys being mounted readonly, as systemd does
   if grep '/proc/sys\s\+\w\+\s\+ro,' /proc/mounts >/dev/null; then
@@ -123,7 +124,6 @@ start_docker() {
 
   rm -f "${DOCKERD_PID_FILE}"
   touch "${DOCKERD_LOG_FILE}"
-  set +e
 
   echo >&2 "Starting Docker..."
   dockerd ${docker_opts} &>"${DOCKERD_LOG_FILE}" &
