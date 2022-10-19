@@ -117,6 +117,17 @@ start_docker() {
     docker_opts+=" --mtu ${mtu}"
   fi
 
+  if [[ -n "${REGISTRY_MIRROR:-}" ]]; then
+    echo "Using registry-mirror ${REGISTRY_MIRROR}"
+    if ! [[ $REGISTRY_MIRROR =~ "http" ]]; then
+      echo "REGISTRY_MIRROR ${REGISTRY_MIRROR} does not start with (http|https), prefixing https://"
+      REGISTRY_MIRROR="https://${REGISTRY_MIRROR}"
+    fi
+    docker_opts+=" --registry-mirror=${REGISTRY_MIRROR}"
+  elif [[ -z "${DOCKER_IO_USERNAME:-}" ]] || [[ -z "${DOCKER_IO_PASSWORD:-}" ]]; then
+    echo "Both REGISTRY_MIRROR and DOCKER_IO_USERNAME/PASSWORD missing; you are likely to hit registry pull limits"
+  fi
+
   # Use Concourse's scratch volume to bypass the graph filesystem by default
   if [[ "${docker_opts}" != *'--data-root'* ]] && [[ "${docker_opts}" != *'--graph'* ]]; then
     docker_opts+=' --data-root /scratch/docker'
@@ -181,6 +192,11 @@ stop_docker() {
 start_docker
 trap stop_docker EXIT
 await_docker
+
+if [[ -n "${DOCKER_IO_USERNAME:-}" ]] && [[ -n "${DOCKER_IO_PASSWORD:-}" ]]; then
+  echo "Logging in to docker"
+  docker login -u "${DOCKER_IO_USERNAME}" -p "${DOCKER_IO_PASSWORD}"
+fi
 
 # do not exec, because exec disables traps
 if [[ "$#" != "0" ]]; then
