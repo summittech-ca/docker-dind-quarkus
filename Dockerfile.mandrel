@@ -25,10 +25,10 @@ RUN echo "quarkus ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/quarkus
 
 # RHEL8 in their infinite wisdom removed the binaries for
 # iptables-legacy, so we're left resorting to obscure 1-off pckages
-# N.B.: these packages from quay.io/calico/node:release-v3.13
-RUN mkdir -p /tmp/rpms
+# N.B.: these packages from quay.io/calico/node:release-v3.13r
+RUN mkdir -p /tmp/rpms /opt/iptables-legacy
 COPY iptables-1.8.2-16.el8.x86_64.rpm /tmp/rpms
-RUN rpm -i --nodeps --force /tmp/rpms/iptables-1.8.2-16.el8.x86_64.rpm
+RUN cd /opt/iptables-legacy && rpm -i --nodeps --force /tmp/rpms/iptables-1.8.2-16.el8.x86_64.rpm
 
 # USER quarkus
 
