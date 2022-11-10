@@ -1,6 +1,6 @@
 # Inspired by https://github.com/fhivemind/concourse-dind
 
-FROM quay.io/quarkus/ubi-quarkus-mandrel:21.3.3.0-Final-java17
+FROM quay.io/quarkus/ubi-quarkus-mandrel:22.3-java17
 
 ENV DOCKER_CHANNEL=stable \
     DOCKER_VERSION=20.10.17 \
