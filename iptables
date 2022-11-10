@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec /usr/sbin/iptables.orig "$@" 2 >> /tmp/iptables.stderr

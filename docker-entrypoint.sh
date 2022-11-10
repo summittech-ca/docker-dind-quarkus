@@ -4,17 +4,15 @@
 # Inspired by concourse/docker-image-resource:
 # https://github.com/concourse/docker-image-resource/blob/master/assets/common.sh
 
+echo "$0"
+
 set -o errexit -o pipefail -o nounset
 
-
 # Switch to iptables-legacy if needed
-if ! iptables -L; then
-  echo >&2 "'iptables -L' failed; trying with iptables-legacy?"
-	if grep -i "rhel" /etc/os-release; then
-		update-alternatives --set iptables /usr/sbin/iptables-legacy
-	else
-		alternatives --install /usr/sbin/iptables iptables /opt/iptables-legacy/usr/sbin/iptables-legacy 1 && alternatives --install /usr/sbin/ip6tables ip6tables /opt/iptables-legacy/usr/sbin/ip6tables-legacy 1
-	fi
+if ! iptables -L || [[ "$(iptables -L 2>&1 1>/dev/null)" != "" ]]; then
+  echo >&2 "'iptables -L' failed or produced a warning; trying with iptables-legacy?"
+  mv /usr/sbin/iptables /usr/sbin/iptables.orig
+  ln -s /opt/iptables-legacy/usr/sbin/iptables-legacy /usr/sbin/iptables
 	if ! iptables -L; then
 	  echo >&2 "'iptables -L' failed even with iptables-legacy, docker is likely to fail to start"
 	fi
@@ -132,6 +130,7 @@ start_docker() {
   if [[ "${docker_opts}" != *'--data-root'* ]] && [[ "${docker_opts}" != *'--graph'* ]]; then
     docker_opts+=' --data-root /scratch/docker'
   fi
+  docker_opts+=" --storage-driver=fuse-overlayfs"
 
   rm -f "${DOCKERD_PID_FILE}"
   touch "${DOCKERD_LOG_FILE}"

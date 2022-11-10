@@ -14,7 +14,7 @@ ENV DOCKER_CHANNEL=stable \
 # Install Docker, Docker Machine, Docker Squash
 USER root
 RUN microdnf update
-RUN microdnf install -y yum-utils procps findutils wget bash curl wget net-tools iproute jq
+RUN microdnf install -y yum-utils procps findutils wget bash curl wget net-tools iproute jq cpio
 RUN yum-config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
 RUN microdnf install -y docker-ce-3:20.10.17-3.el8.x86_64
 RUN wget -L https://github.com/docker/machine/releases/download/v0.8.0-rc1/docker-machine-`uname -s`-`uname -m`
@@ -28,7 +28,10 @@ RUN echo "quarkus ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/quarkus
 # N.B.: these packages from quay.io/calico/node:release-v3.13r
 RUN mkdir -p /tmp/rpms /opt/iptables-legacy
 COPY iptables-1.8.2-16.el8.x86_64.rpm /tmp/rpms
-RUN cd /opt/iptables-legacy && rpm -i --nodeps --force /tmp/rpms/iptables-1.8.2-16.el8.x86_64.rpm
+RUN cd /opt/iptables-legacy && rpm2cpio /tmp/rpms/iptables-1.8.2-16.el8.x86_64.rpm | cpio -div
+
+# RUN mv /usr/sbin/iptables /usr/sbin/iptables.orig
+# COPY iptables /usr/sbin/iptables
 
 # USER quarkus
 
